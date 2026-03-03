@@ -23,6 +23,7 @@ const Canvas = React.forwardRef((props, ref) => {
     setCurrentFrame,
     selection,
     setSelection,
+    canvasBackgroundColor,
   } = props;
 
   const stageRef = useRef(null);
@@ -378,7 +379,7 @@ const Canvas = React.forwardRef((props, ref) => {
         onMouseLeave={handleMouseUp}
       >
         <Layer>
-          <Rect x={boardX} y={boardY} width={boardSize} height={boardSize} fill="#101010" />
+          <Rect x={boardX} y={boardY} width={boardSize} height={boardSize} fill={canvasBackgroundColor} />
 
           {displayLayer?.pixels.map((row, rowIdx) =>
             row.map((color, colIdx) => {

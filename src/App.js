@@ -24,6 +24,7 @@ function App() {
   const [mirrorX, setMirrorX] = useState(false);
   const [mirrorY, setMirrorY] = useState(false);
   const [showGrid, setShowGrid] = useState(true);
+  const [canvasBackgroundColor, setCanvasBackgroundColor] = useState('#101010');
   
   const initialLayerId = useRef(null);
   const [layers, setLayers] = useState(() => {
@@ -326,6 +327,7 @@ function App() {
           setCurrentFrame={setCurrentFrame}
           selection={selection}
           setSelection={setSelection}
+          canvasBackgroundColor={canvasBackgroundColor}
         />
         <Toolbar
           brushSize={brushSize}
@@ -357,6 +359,8 @@ function App() {
           onCopy={handleCopy}
           onPaste={handlePaste}
           hasSelection={!!selection}
+          canvasBackgroundColor={canvasBackgroundColor}
+          setCanvasBackgroundColor={setCanvasBackgroundColor}
         />
       </div>
     </div>

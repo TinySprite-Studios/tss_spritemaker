@@ -24,39 +24,41 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build application
-        run: npm run build
+      - name: Build application (Windows)
+        if: matrix.os == 'windows-latest'
+        run: npm run build-windows
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Build application (macOS)
+        if: matrix.os == 'macos-latest'
+        run: npm run build-mac
+
+      - name: Build application (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: npm run build-linux
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
-          files: |
-            dist/**/*.exe
-            dist/**/*.msi
-            dist/**/*.AppImage
-            dist/**/*.deb
-            dist/**/*.dmg
-            dist/**/*.zip
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: dist-${{ matrix.os }}
+          path: dist/
 
-  create-release:
+  release:
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     
     steps:
-      - uses: actions/checkout@v3
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
 
-      - name: Create Release Notes
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          files: |
+            dist-windows-latest/**/*
+            dist-macos-latest/**/*
+            dist-ubuntu-latest/**/*
           draft: false
           prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

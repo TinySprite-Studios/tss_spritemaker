@@ -31,6 +31,8 @@ function Toolbar({
   onCopy,
   onPaste,
   hasSelection,
+  canvasBackgroundColor,
+  setCanvasBackgroundColor,
 }) {
   const [openSections, setOpenSections] = useState({
     tools: true,
@@ -151,14 +153,26 @@ function Toolbar({
               </select>
             </div>
 
-            <div className="subsection">
-              <label>Color</label>
-              <input
-                type="color"
-                value={brushColor}
-                onChange={(e) => setBrushColor(e.target.value)}
-              />
-              <span className="color-display">{brushColor}</span>
+            <div className="color-pickers-row">
+              <div className="subsection">
+                <label>Color</label>
+                <input
+                  type="color"
+                  value={brushColor}
+                  onChange={(e) => setBrushColor(e.target.value)}
+                />
+                <span className="color-display">{brushColor}</span>
+              </div>
+
+              <div className="subsection">
+                <label>Canvas BG <span style={{ fontSize: '10px', opacity: 0.6 }}>(export: transparent)</span></label>
+                <input
+                  type="color"
+                  value={canvasBackgroundColor}
+                  onChange={(e) => setCanvasBackgroundColor(e.target.value)}
+                />
+                <span className="color-display">{canvasBackgroundColor}</span>
+              </div>
             </div>
           </div>
         )}

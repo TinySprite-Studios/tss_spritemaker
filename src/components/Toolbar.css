@@ -140,6 +140,17 @@ input[type="color"] {
   margin-bottom: 8px;
 }
 
+.color-pickers-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.color-pickers-row .subsection {
+  flex: 1;
+  margin-bottom: 0;
+}
+
 .mode-toggle {
   display: grid;
   grid-template-columns: 1fr auto;
