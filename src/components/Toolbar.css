@@ -1,0 +1,365 @@
+.toolbar {
+  width: 250px;
+  background-color: #0a0a0a;
+  border: 1px solid #1c1c1c;
+  border-radius: 4px;
+  padding: 15px;
+  overflow-y: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.toolbar-section {
+  margin-bottom: 12px;
+  border-bottom: 1px solid #1c1c1c;
+  padding-bottom: 12px;
+}
+
+.toolbar-section:last-child {
+  border-bottom: none;
+}
+
+.collapsible-header {
+  font-size: 14px;
+  color: #ff1a1a;
+  margin: 0;
+  padding: 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  transition: color 0.2s ease;
+}
+
+.collapsible-header:hover {
+  color: #ff4444;
+}
+
+.collapse-icon {
+  font-size: 10px;
+  color: #999;
+}
+
+.section-content {
+  margin-top: 10px;
+}
+
+.tool-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.tool-buttons button {
+  flex: 1;
+}
+
+.subsection {
+  margin-bottom: 15px;
+}
+
+.subsection label {
+  display: block;
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.actions-section {
+  border-top: 2px solid #ff1a1a;
+  padding-top: 15px;
+  margin-top: 15px;
+}
+
+.toolbar-section h3 {
+  font-size: 14px;
+  color: #ff1a1a;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.toolbar-section button {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 10px;
+  border: 1px solid #1c1c1c;
+  border-radius: 4px;
+  background-color: #0f0f0f;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toolbar-section button:hover {
+  background-color: #1a1a1a;
+  border-color: #333;
+}
+
+.toolbar-section button.active {
+  background-color: #ff1a1a;
+  border-color: #ff1a1a;
+  box-shadow: 0 0 10px rgba(255, 26, 26, 0.5);
+}
+
+.section-content input[type="range"] {
+  width: 100%;
+  margin: 0 0 8px 0;
+}
+
+.section-content select,
+.toolbar-section select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #1c1c1c;
+  border-radius: 4px;
+  background-color: #0f0f0f;
+  color: #fff;
+  font-size: 14px;
+}
+
+.value-display,
+.color-display {
+  display: block;
+  font-size: 12px;
+  color: #999;
+  margin-top: 5px;
+}
+
+input[type="color"] {
+  display: block;
+  width: 100%;
+  height: 50px;
+  border: 2px solid #1c1c1c;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.mode-toggle {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.mode-toggle span:first-child {
+  color: #fff;
+  font-size: 13px;
+}
+
+.mode-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-slider {
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background-color: #1c1c1c;
+  border: 1px solid #333;
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 2px;
+  top: 2px;
+  border-radius: 50%;
+  background-color: #fff;
+  transition: transform 0.2s ease;
+}
+
+.mode-toggle input:checked + .toggle-slider {
+  background-color: #00e5ff;
+}
+
+.mode-toggle input:checked + .toggle-slider::before {
+  transform: translateX(18px);
+}
+
+.animation-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.play-btn {
+  flex: 1;
+  padding: 10px;
+  background-color: #ff1a1a;
+  color: #fff;
+  border: 1px solid #ff1a1a;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.play-btn:hover {
+  background-color: #cc1515;
+  box-shadow: 0 0 10px rgba(255, 26, 26, 0.4);
+}
+
+.play-btn.playing {
+  background-color: #00e5ff;
+  color: #00131a;
+  border-color: #00e5ff;
+}
+
+.frame-counter {
+  display: flex;
+  align-items: center;
+  color: #999;
+  font-size: 13px;
+  padding: 0 8px;
+}
+
+.slider-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.slider-label span:first-child {
+  color: #fff;
+  font-size: 12px;
+}
+
+.slider-label input[type="range"] {
+  width: 100%;
+}
+
+.fps-value {
+  color: #999;
+  font-size: 12px;
+  text-align: right;
+}
+
+.save-btn {
+  background-color: #00e5ff;
+  color: #00131a;
+  font-weight: bold;
+}
+
+.reset-all-btn {
+  background-color: #ff9800;
+  color: #fff;
+  font-weight: bold;
+}
+
+.reset-all-btn:hover {
+  background-color: #ffb74d;
+  box-shadow: 0 0 8px rgba(255, 152, 0, 0.5);
+}
+
+.import-btn {
+  background-color: #4caf50;
+  color: #fff;
+  font-weight: bold;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #4caf50;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 10px;
+}
+
+.import-btn:hover:not(:disabled) {
+  background-color: #45a049;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.4);
+}
+
+.import-btn:disabled {
+  background-color: #1c1c1c;
+  color: #666;
+  border-color: #1c1c1c;
+  cursor: not-allowed;
+}
+
+.file-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #1c1c1c;
+  border-radius: 4px;
+  background-color: #0f0f0f;
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.file-input::-webkit-file-upload-button {
+  background-color: #1c1c1c;
+  color: #fff;
+  border: 1px solid #333;
+  border-radius: 3px;
+  padding: 6px 12px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.file-input::-webkit-file-upload-button:hover {
+  background-color: #2a2a2a;
+}
+
+.file-selected {
+  display: block;
+  font-size: 11px;
+  color: #4caf50;
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
+
+.frame-count-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #1c1c1c;
+  border-radius: 4px;
+  background-color: #0f0f0f;
+  color: #fff;
+  font-size: 14px;
+}
+
+.frame-count-input:focus {
+  outline: none;
+  border-color: #ff1a1a;
+}
+
+.frame-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.frame-input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-label {
+  font-size: 11px;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.save-btn:hover {
+  background-color: #00b4cc;
+}

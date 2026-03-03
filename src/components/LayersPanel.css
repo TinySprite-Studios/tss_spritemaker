@@ -1,0 +1,140 @@
+.layers-panel {
+  width: 250px;
+  background-color: #0a0a0a;
+  border: 1px solid #1c1c1c;
+  border-radius: 4px;
+  padding: 15px;
+  overflow-y: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.layers-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.layers-header h3 {
+  font-size: 14px;
+  color: #ff1a1a;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.layer-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.layer-actions button {
+  flex: 1;
+  padding: 8px;
+}
+
+.layers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.layer-item {
+  width: 100%;
+  text-align: left;
+  padding: 10px;
+  border: 1px solid #1c1c1c;
+  background-color: #0f0f0f;
+  color: #fff;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.layer-item:hover {
+  background-color: #1a1a1a;
+}
+
+.layer-item small {
+  color: #999;
+}
+
+.layer-item.active {
+  border-color: #ff1a1a;
+  box-shadow: 0 0 10px rgba(255, 26, 26, 0.35);
+  background-color: #1a0f0f;
+}
+
+.layer-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.delete-layer-btn {
+  opacity: 0;
+  padding: 4px 8px;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: #ff4444;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 14px;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rename-layer-btn {
+  opacity: 0;
+  padding: 4px 8px;
+  background-color: transparent;
+  border: 1px solid transparent;
+  color: #4da6ff;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 14px;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.layer-item:hover .delete-layer-btn,
+.layer-item:hover .rename-layer-btn {
+  opacity: 1;
+}
+
+.delete-layer-btn:hover {
+  background-color: #ff4444;
+  border-color: #ff4444;
+  filter: brightness(1.2);
+}
+
+.rename-layer-btn:hover {
+  background-color: #4da6ff;
+  border-color: #4da6ff;
+  filter: brightness(1.2);
+}
+
+.rename-input {
+  flex: 1;
+  padding: 4px 6px;
+  background-color: #1a1a1a;
+  border: 1px solid #4da6ff;
+  color: #fff;
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.rename-input:focus {
+  outline: none;
+  border-color: #4da6ff;
+  box-shadow: 0 0 4px rgba(77, 166, 255, 0.5);
+}

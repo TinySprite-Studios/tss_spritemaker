@@ -1,0 +1,72 @@
+{
+  "name": "tss-spritemaker",
+  "version": "0.1.0",
+  "description": "A desktop application for creating 2D images and saving them as sprites",
+  "main": "public/electron.js",
+  "homepage": "./",
+  "author": "Your Name",
+  "license": "MIT",
+  "scripts": {
+    "react-start": "react-scripts start",
+    "react-build": "react-scripts build",
+    "react-test": "react-scripts test",
+    "react-eject": "react-scripts eject",
+    "electron-start": "electron .",
+    "dev": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000 && npm run electron-start\"",
+    "start": "concurrently \"npm run react-start\" \"wait-on http://localhost:3000 && npm run electron-start\"",
+    "build-electron": "npm run react-build && electron-builder --publish never",
+    "build-onedrive": "electron-builder --win --publish never",
+    "build": "build-safe.bat",
+    "build-linux": "npm run react-build && electron-builder --linux",
+    "build-mac": "npm run react-build && electron-builder --mac",
+    "build-windows": "npm run react-build && electron-builder --win"
+  },
+  "dependencies": {
+    "konva": "^9.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-konva": "^18.2.10"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.1",
+    "electron": "^27.0.0",
+    "electron-builder": "^26.8.1",
+    "electron-is-dev": "^2.0.0",
+    "react-scripts": "5.0.1",
+    "wait-on": "^7.0.1"
+  },
+  "build": {
+    "appId": "com.tss-spritemaker",
+    "productName": "TSS Sprite Maker",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "public/electron.js",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "signAndEditExecutable": false
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

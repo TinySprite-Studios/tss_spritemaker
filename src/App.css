@@ -1,0 +1,27 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #0a0a0a;
+}
+
+.app-header {
+  background-color: #0f0f0f;
+  padding: 20px;
+  border-bottom: 2px solid #ff1a1a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.app-header h1 {
+  color: #ff1a1a;
+  font-size: 28px;
+  margin: 0;
+}
+
+.app-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  gap: 10px;
+  padding: 10px;
+}
