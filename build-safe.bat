@@ -4,6 +4,9 @@ setlocal enabledelayedexpansion
 
 set "SOURCE_DIR=%CD%"
 set "BUILD_DIR=C:\temp\tss_spritemaker_build"
+set "SOURCE_DIST=%SOURCE_DIR%\dist"
+set "BUILD_DIST=%BUILD_DIR%\dist"
+set "DESKTOP_DIST=%USERPROFILE%\Desktop\TSS Sprite Maker Build"
 
 echo.
 echo TSS Sprite Maker - Safe Build Script
@@ -28,6 +31,7 @@ REM Navigate to build directory and build
 echo Starting build process...
 echo.
 cd /d "%BUILD_DIR%"
+if exist "%BUILD_DIST%" rmdir /s /q "%BUILD_DIST%" >nul 2>&1
 call npm run build-electron
 if errorlevel 1 goto build_failed
 
@@ -39,14 +43,31 @@ echo Copying executable back to project...
 
 REM Find exe and copy dist back
 cd /d "%SOURCE_DIR%"
-if exist "%BUILD_DIR%\dist\*.exe" (
-    rmdir /s /q "%SOURCE_DIR%\dist" >nul 2>&1
-    timeout /t 1 /nobreak >nul
-    xcopy /E /I /Y "%BUILD_DIR%\dist" "%SOURCE_DIR%\dist" >nul 2>&1
+if exist "%BUILD_DIST%\*.exe" (
+    taskkill /F /IM "TSS Sprite Maker.exe" >nul 2>&1
+    taskkill /F /IM "electron.exe" >nul 2>&1
+    if exist "%SOURCE_DIST%\dist" rmdir /s /q "%SOURCE_DIST%\dist" >nul 2>&1
+    if not exist "%SOURCE_DIST%" mkdir "%SOURCE_DIST%"
+    robocopy "%BUILD_DIST%" "%SOURCE_DIST%" /MIR /R:2 /W:1 /NFL /NDL /NJH /NJS /NP >nul
+    if errorlevel 8 (
+        echo Source dist is locked. Copying build output to Desktop fallback location...
+        if not exist "%DESKTOP_DIST%" mkdir "%DESKTOP_DIST%"
+        robocopy "%BUILD_DIST%" "%DESKTOP_DIST%" /MIR /R:2 /W:1 /NFL /NDL /NJH /NJS /NP >nul
+        if errorlevel 8 (
+            echo Failed to copy build output to both source and desktop fallback folders.
+            echo Close any open files from %SOURCE_DIST% and run again.
+            goto cleanup
+        )
+        echo Executable created successfully in fallback location!
+        echo Location: %DESKTOP_DIST%
+        echo.
+        dir "%DESKTOP_DIST%\*.exe"
+        goto cleanup
+    )
     echo Executable created successfully!
-    echo Location: %SOURCE_DIR%\dist
+    echo Location: %SOURCE_DIST%
     echo.
-    dir "%SOURCE_DIR%\dist\*.exe"
+    dir "%SOURCE_DIST%\*.exe"
 ) else (
     echo Build completed but executable not found!
     goto cleanup

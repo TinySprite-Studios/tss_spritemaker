@@ -169,76 +169,125 @@ function App() {
     }
   };
 
-  const handleImportSprite = (file, horizontalFrames, verticalFrames) => {
+  const handleImportSprite = (file, horizontalFrames, verticalFrames, mode = 'spritesheet', targetDimension = null) => {
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       
-      const frameWidth = Math.floor(img.width / horizontalFrames);
-      const frameHeight = Math.floor(img.height / verticalFrames);
-      const totalFrames = horizontalFrames * verticalFrames;
-      
-      // Determine grid size based on frame dimensions
-      let newGridSize = Math.max(frameWidth, frameHeight);
-      if (newGridSize <= 8) newGridSize = 8;
-      else if (newGridSize <= 16) newGridSize = 16;
-      else if (newGridSize <= 32) newGridSize = 32;
-      else newGridSize = 64;
-      
-      setGridSize(newGridSize);
-      
-      const newLayers = [];
-      
-      for (let row = 0; row < verticalFrames; row++) {
-        for (let col = 0; col < horizontalFrames; col++) {
-          const frameIndex = row * horizontalFrames + col;
-          
-          canvas.width = frameWidth;
-          canvas.height = frameHeight;
-          
-          ctx.clearRect(0, 0, frameWidth, frameHeight);
-          ctx.drawImage(
-            img,
-            col * frameWidth,
-            row * frameHeight,
-            frameWidth,
-            frameHeight,
-            0,
-            0,
-            frameWidth,
-            frameHeight
-          );
-          
-          const imageData = ctx.getImageData(0, 0, frameWidth, frameHeight);
-          const pixels = createEmptyGrid(newGridSize);
-          
-          for (let y = 0; y < frameHeight && y < newGridSize; y++) {
-            for (let x = 0; x < frameWidth && x < newGridSize; x++) {
-              const idx = (y * frameWidth + x) * 4;
-              const r = imageData.data[idx];
-              const g = imageData.data[idx + 1];
-              const b = imageData.data[idx + 2];
-              const a = imageData.data[idx + 3];
-              
-              if (a > 0) {
-                const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-                pixels[y][x] = hex;
-              }
+      if (mode === 'single') {
+        // Single image import - resize to target dimension
+        const newGridSize = targetDimension || 16;
+        setGridSize(newGridSize);
+        
+        canvas.width = newGridSize;
+        canvas.height = newGridSize;
+        
+        // Draw the image scaled to fit the canvas
+        // Use 'contain' scaling to preserve aspect ratio
+        const scale = Math.min(newGridSize / img.width, newGridSize / img.height);
+        const scaledWidth = img.width * scale;
+        const scaledHeight = img.height * scale;
+        const offsetX = (newGridSize - scaledWidth) / 2;
+        const offsetY = (newGridSize - scaledHeight) / 2;
+        
+        ctx.clearRect(0, 0, newGridSize, newGridSize);
+        ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
+        
+        const imageData = ctx.getImageData(0, 0, newGridSize, newGridSize);
+        const pixels = createEmptyGrid(newGridSize);
+        
+        for (let y = 0; y < newGridSize; y++) {
+          for (let x = 0; x < newGridSize; x++) {
+            const idx = (y * newGridSize + x) * 4;
+            const r = imageData.data[idx];
+            const g = imageData.data[idx + 1];
+            const b = imageData.data[idx + 2];
+            const a = imageData.data[idx + 3];
+            
+            if (a > 0) {
+              const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+              pixels[y][x] = hex;
             }
           }
-          
-          newLayers.push({
-            id: nextLayerId++,
-            name: `Frame ${frameIndex + 1}`,
-            pixels: pixels,
-          });
         }
+        
+        const newLayer = {
+          id: nextLayerId++,
+          name: 'Imported Image',
+          pixels: pixels,
+        };
+        
+        setLayers([newLayer]);
+        setActiveLayerId(newLayer.id);
+        setCurrentFrame(0);
+      } else {
+        // Sprite sheet import - existing logic
+        const frameWidth = Math.floor(img.width / horizontalFrames);
+        const frameHeight = Math.floor(img.height / verticalFrames);
+        const totalFrames = horizontalFrames * verticalFrames;
+        
+        // Determine grid size based on frame dimensions
+        let newGridSize = Math.max(frameWidth, frameHeight);
+        if (newGridSize <= 8) newGridSize = 8;
+        else if (newGridSize <= 16) newGridSize = 16;
+        else if (newGridSize <= 32) newGridSize = 32;
+        else newGridSize = 64;
+        
+        setGridSize(newGridSize);
+        
+        const newLayers = [];
+        
+        for (let row = 0; row < verticalFrames; row++) {
+          for (let col = 0; col < horizontalFrames; col++) {
+            const frameIndex = row * horizontalFrames + col;
+            
+            canvas.width = frameWidth;
+            canvas.height = frameHeight;
+            
+            ctx.clearRect(0, 0, frameWidth, frameHeight);
+            ctx.drawImage(
+              img,
+              col * frameWidth,
+              row * frameHeight,
+              frameWidth,
+              frameHeight,
+              0,
+              0,
+              frameWidth,
+              frameHeight
+            );
+            
+            const imageData = ctx.getImageData(0, 0, frameWidth, frameHeight);
+            const pixels = createEmptyGrid(newGridSize);
+            
+            for (let y = 0; y < frameHeight && y < newGridSize; y++) {
+              for (let x = 0; x < frameWidth && x < newGridSize; x++) {
+                const idx = (y * frameWidth + x) * 4;
+                const r = imageData.data[idx];
+                const g = imageData.data[idx + 1];
+                const b = imageData.data[idx + 2];
+                const a = imageData.data[idx + 3];
+                
+                if (a > 0) {
+                  const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+                  pixels[y][x] = hex;
+                }
+              }
+            }
+            
+            newLayers.push({
+              id: nextLayerId++,
+              name: `Frame ${frameIndex + 1}`,
+              pixels: pixels,
+            });
+          }
+        }
+        
+        setLayers(newLayers);
+        setActiveLayerId(newLayers[0].id);
+        setCurrentFrame(0);
       }
-      
-      setLayers(newLayers);
-      setActiveLayerId(newLayers[0].id);
-      setCurrentFrame(0);
     };
     
     img.src = URL.createObjectURL(file);

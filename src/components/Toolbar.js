@@ -45,6 +45,8 @@ function Toolbar({
   const [verticalFrames, setVerticalFrames] = useState(0);
   const [selectedFile, setSelectedFile] = useState(null);
   const [exportRows, setExportRows] = useState(1);
+  const [importMode, setImportMode] = useState('single'); // 'single' or 'spritesheet'
+  const [targetDimension, setTargetDimension] = useState(16);
 
   const toggleSection = (section) => {
     setOpenSections((prev) => ({
@@ -62,7 +64,12 @@ function Toolbar({
 
   const handleImportClick = () => {
     if (selectedFile && onImport) {
-      onImport(selectedFile, horizontalFrames, verticalFrames);
+      if (importMode === 'spritesheet') {
+        onImport(selectedFile, horizontalFrames, verticalFrames, 'spritesheet', null);
+      } else {
+        // Single image import with target dimension
+        onImport(selectedFile, 1, 1, 'single', targetDimension);
+      }
       setSelectedFile(null);
     }
   };
@@ -239,7 +246,19 @@ function Toolbar({
         {openSections.import && (
           <div className="section-content">
             <div className="subsection">
-              <label>Sprite Sheet</label>
+              <label>Import Mode</label>
+              <select
+                value={importMode}
+                onChange={(e) => setImportMode(e.target.value)}
+                className="mode-select"
+              >
+                <option value="single">Single Image</option>
+                <option value="spritesheet">Sprite Sheet</option>
+              </select>
+            </div>
+
+            <div className="subsection">
+              <label>Image File</label>
               <input
                 type="file"
                 accept="image/*"
@@ -251,40 +270,61 @@ function Toolbar({
               )}
             </div>
 
-            <div className="subsection">
-              <label>Grid Dimensions</label>
-              <div className="frame-inputs">
-                <div className="frame-input-group">
-                  <span className="input-label">Horizontal</span>
-                  <input
-                    type="number"
-                    min="1"
-                    max="32"
-                    value={horizontalFrames}
-                    onChange={(e) => setHorizontalFrames(parseInt(e.target.value) || 1)}
-                    className="frame-count-input"
-                  />
-                </div>
-                <div className="frame-input-group">
-                  <span className="input-label">Vertical</span>
-                  <input
-                    type="number"
-                    min="1"
-                    max="32"
-                    value={verticalFrames}
-                    onChange={(e) => setVerticalFrames(parseInt(e.target.value) || 1)}
-                    className="frame-count-input"
-                  />
+            {importMode === 'single' && (
+              <div className="subsection">
+                <label>Target Sprite Size</label>
+                <select
+                  value={targetDimension}
+                  onChange={(e) => setTargetDimension(parseInt(e.target.value))}
+                  className="dimension-select"
+                >
+                  <option value={8}>8x8</option>
+                  <option value={16}>16x16</option>
+                  <option value={32}>32x32</option>
+                  <option value={64}>64x64</option>
+                </select>
+                <small style={{ color: '#999', marginTop: '4px', display: 'block' }}>
+                  Image will be resized to fit this dimension
+                </small>
+              </div>
+            )}
+
+            {importMode === 'spritesheet' && (
+              <div className="subsection">
+                <label>Grid Dimensions</label>
+                <div className="frame-inputs">
+                  <div className="frame-input-group">
+                    <span className="input-label">Horizontal</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="32"
+                      value={horizontalFrames}
+                      onChange={(e) => setHorizontalFrames(parseInt(e.target.value) || 1)}
+                      className="frame-count-input"
+                    />
+                  </div>
+                  <div className="frame-input-group">
+                    <span className="input-label">Vertical</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="32"
+                      value={verticalFrames}
+                      onChange={(e) => setVerticalFrames(parseInt(e.target.value) || 1)}
+                      className="frame-count-input"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <button 
               onClick={handleImportClick} 
-              disabled={!selectedFile}
+              disabled={!selectedFile || (importMode === 'spritesheet' && (!horizontalFrames || !verticalFrames))}
               className="import-btn"
             >
-              📥 Import Sprite Sheet
+              📥 {importMode === 'single' ? 'Import Image' : 'Import Sprite Sheet'}
             </button>
           </div>
         )}
