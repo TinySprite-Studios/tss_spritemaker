@@ -8,10 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -26,22 +23,7 @@ jobs:
         run: npm ci
 
       - name: Build application (Windows)
-        if: matrix.os == 'windows-latest'
         run: npm run build-windows
-        env:
-          CSC_IDENTITY_AUTO_DISCOVERY: false
-          GH_TOKEN: ''
-
-      - name: Build application (macOS)
-        if: matrix.os == 'macos-latest'
-        run: npm run build-mac
-        env:
-          CSC_IDENTITY_AUTO_DISCOVERY: false
-          GH_TOKEN: ''
-
-      - name: Build application (Linux)
-        if: matrix.os == 'ubuntu-latest'
-        run: npm run build-linux
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
           GH_TOKEN: ''
@@ -49,7 +31,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ matrix.os }}
+          name: dist-windows
           path: dist/
 
   release:
@@ -64,10 +46,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            dist-windows-latest/**/*
-            dist-macos-latest/**/*
-            dist-ubuntu-latest/**/*
+          files: dist-windows/**/*
           draft: false
           prerelease: false
         env:
