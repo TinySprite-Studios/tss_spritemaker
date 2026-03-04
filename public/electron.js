@@ -11,8 +11,6 @@ let mainWindow;
 autoUpdater.autoDownload = false;
 autoUpdater.autoInstallOnAppQuit = true;
 
-let mainWindow;
-
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,
