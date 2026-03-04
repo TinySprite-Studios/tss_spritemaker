@@ -28,11 +28,17 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: false
           GH_TOKEN: ''
 
+      - name: Zip build artifacts
+        run: |
+          cd dist
+          powershell -Command "Compress-Archive -Path * -DestinationPath ../tss-spritemaker-windows.zip"
+          cd ..
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dist-windows
-          path: dist/
+          path: tss-spritemaker-windows.zip
 
   release:
     needs: build
@@ -46,7 +52,7 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist-windows/**/*
+          files: dist-windows/tss-spritemaker-windows.zip
           draft: false
           prerelease: false
         env:
