@@ -1,6 +1,6 @@
 {
   "name": "tss-spritemaker",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A desktop application for creating 2D images and saving them as sprites",
   "main": "public/electron.js",
   "homepage": "./",
