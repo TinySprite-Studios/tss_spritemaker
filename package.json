@@ -1,6 +1,6 @@
 {
   "name": "tss-spritemaker",
-  "version": "0.1.0",
+  "version": "0.0.5",
   "description": "A desktop application for creating 2D images and saving them as sprites",
   "main": "public/electron.js",
   "homepage": "./",
@@ -22,8 +22,13 @@
     "build-mac": "npm run react-build && electron-builder --mac --publish never",
     "build-windows": "npm run react-build && electron-builder --win --publish never"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TinySprite-Studios/tss_spritemaker.git"
+  },
   "dependencies": {
     "electron-is-dev": "^2.0.0",
+    "electron-updater": "^6.8.3",
     "konva": "^9.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -48,20 +53,35 @@
       "node_modules/**/*",
       "package.json"
     ],
+    "publish": {
+      "provider": "github",
+      "owner": "TinySprite-Studios",
+      "repo": "tss_spritemaker"
+    },
     "win": {
       "target": [
         {
-          "target": "portable",
-          "arch": ["x64"]
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
     },
     "linux": {
       "target": [
         {
           "target": "AppImage",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
@@ -69,7 +89,10 @@
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ],
       "sign": null,
