@@ -74,11 +74,12 @@ function LayersPanel({
                 onChange={(e) => setNewName(e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e, layer.id)}
                 onBlur={(e) => handleRenameSave(e, layer.id)}
+                maxLength={20}
                 autoFocus
                 onClick={(e) => e.stopPropagation()}
               />
             ) : (
-              <span>{layer.name}</span>
+              <span className="layer-name">{layer.name}</span>
             )}
             <div className="layer-controls">
               <small>#{index + 1}</small>

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import Canvas from './components/Canvas';
 import Toolbar from './components/Toolbar';
 import LayersPanel from './components/LayersPanel';
@@ -38,8 +38,79 @@ function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentFrame, setCurrentFrame] = useState(0);
   const [exportMode, setExportMode] = useState('single');
+  const [exportRows, setExportRows] = useState(1);
   const [clipboard, setClipboard] = useState(null);
   const [selection, setSelection] = useState(null);
+
+  // Undo/Redo state - track per-action
+  const [history, setHistory] = useState([
+    JSON.parse(JSON.stringify([...layers]))
+  ]);
+  const [historyIndex, setHistoryIndex] = useState(0);
+  const isUndoRedoAction = useRef(false);
+
+  const saveStateToHistory = useCallback(() => {
+    if (isUndoRedoAction.current) {
+      return;
+    }
+
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push(JSON.parse(JSON.stringify(layers)));
+    
+    // Limit history to 50 states
+    if (newHistory.length > 50) {
+      newHistory.shift();
+      setHistoryIndex(newHistory.length - 1);
+    } else {
+      setHistoryIndex(newHistory.length - 1);
+    }
+    
+    setHistory(newHistory);
+  }, [history, historyIndex, layers]);
+
+  const handleUndo = useCallback(() => {
+    if (historyIndex > 0) {
+      isUndoRedoAction.current = true;
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      setLayers(JSON.parse(JSON.stringify(history[newIndex])));
+    }
+  }, [history, historyIndex]);
+
+  const handleRedo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      isUndoRedoAction.current = true;
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      setLayers(JSON.parse(JSON.stringify(history[newIndex])));
+    }
+  }, [history, historyIndex]);
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      } else if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleUndo, handleRedo]);
+
+  // Reset isUndoRedoAction after a short delay
+  useEffect(() => {
+    if (isUndoRedoAction.current) {
+      const timer = setTimeout(() => {
+        isUndoRedoAction.current = false;
+      }, 10);
+      return () => clearTimeout(timer);
+    }
+  }, [historyIndex]);
 
   const handleGridSizeChange = (newGridSize) => {
     setGridSize(newGridSize);
@@ -137,15 +208,16 @@ function App() {
 
   const handleToolChange = (newTool) => {
     setTool(newTool);
-    // Clear selection when switching away from select tool
-    if (newTool !== 'select') {
+    // Clear selection only when switching to drawing tools (pen/eraser)
+    // Keep selection when switching to move or select tools
+    if (newTool === 'pen' || newTool === 'eraser') {
       setSelection(null);
     }
   };
 
   const handleSaveAsSprite = () => {
     if (canvasRef.current) {
-      const canvas = canvasRef.current.exportSprite(exportMode);
+      const canvas = canvasRef.current.exportSprite(exportMode, exportRows);
       const link = document.createElement('a');
       link.href = canvas.toDataURL('image/png');
       link.download = 'sprite.png';
@@ -297,7 +369,27 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>TSS Sprite Maker</h1>
+        <div className="header-content">
+          <h1>TSS Sprite Maker</h1>
+          <div className="header-controls">
+            <button 
+              onClick={handleUndo} 
+              disabled={!handleUndo || historyIndex <= 0} 
+              title="Undo (Ctrl+Z)"
+              className="header-btn"
+            >
+              ↶ Undo
+            </button>
+            <button 
+              onClick={handleRedo} 
+              disabled={!handleRedo || historyIndex >= history.length - 1} 
+              title="Redo (Ctrl+Y)"
+              className="header-btn"
+            >
+              ↷ Redo
+            </button>
+          </div>
+        </div>
       </header>
       <div className="app-container">
         <LayersPanel
@@ -328,6 +420,7 @@ function App() {
           selection={selection}
           setSelection={setSelection}
           canvasBackgroundColor={canvasBackgroundColor}
+          onActionComplete={saveStateToHistory}
         />
         <Toolbar
           brushSize={brushSize}
@@ -352,6 +445,8 @@ function App() {
           totalFrames={layers.length}
           exportMode={exportMode}
           setExportMode={setExportMode}
+          exportRows={exportRows}
+          setExportRows={setExportRows}
           onSave={handleSaveAsSprite}
           onClear={handleClear}
           onResetAll={handleResetAll}
@@ -361,6 +456,10 @@ function App() {
           hasSelection={!!selection}
           canvasBackgroundColor={canvasBackgroundColor}
           setCanvasBackgroundColor={setCanvasBackgroundColor}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          canUndo={historyIndex > 0}
+          canRedo={historyIndex < history.length - 1}
         />
       </div>
     </div>

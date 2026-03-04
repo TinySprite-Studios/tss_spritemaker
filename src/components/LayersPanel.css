@@ -69,6 +69,13 @@
   background-color: #1a0f0f;
 }
 
+.layer-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 120px;
+}
+
 .layer-controls {
   display: flex;
   align-items: center;

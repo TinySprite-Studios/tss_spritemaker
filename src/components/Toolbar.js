@@ -24,6 +24,8 @@ function Toolbar({
   totalFrames,
   exportMode,
   setExportMode,
+  exportRows,
+  setExportRows,
   onSave,
   onClear,
   onResetAll,
@@ -33,6 +35,10 @@ function Toolbar({
   hasSelection,
   canvasBackgroundColor,
   setCanvasBackgroundColor,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
 }) {
   const [openSections, setOpenSections] = useState({
     tools: true,
@@ -46,7 +52,7 @@ function Toolbar({
   const [horizontalFrames, setHorizontalFrames] = useState(0);
   const [verticalFrames, setVerticalFrames] = useState(0);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [exportRows, setExportRows] = useState(1);
+
   const [importMode, setImportMode] = useState('single'); // 'single' or 'spritesheet'
   const [targetDimension, setTargetDimension] = useState(16);
 
@@ -77,15 +83,7 @@ function Toolbar({
   };
 
   const getExportModeDisplay = () => {
-    if (exportMode.startsWith('grid')) {
-      const rows = parseInt(exportMode.split('-')[1]);
-      return `Grid (${rows} row${rows > 1 ? 's' : ''})`;
-    }
-    return {
-      'single': 'Single Layer',
-      'horizontal': 'All Layers (Horizontal)',
-      'vertical': 'All Layers (Vertical)',
-    }[exportMode] || 'Single Layer';
+    return exportMode === 'single' ? 'Single Layer' : 'Sprite Sheet';
   };
 
   return (
@@ -101,20 +99,30 @@ function Toolbar({
             <button
               className={tool === 'pen' ? 'active' : ''}
               onClick={() => setTool('pen')}
+              title="Pen"
             >
-              ✏️ Pen
+              ✏️
             </button>
             <button
               className={tool === 'eraser' ? 'active' : ''}
               onClick={() => setTool('eraser')}
+              title="Eraser"
             >
-              🧹 Eraser
+              🧹
+            </button>
+            <button
+              className={tool === 'move' ? 'active' : ''}
+              onClick={() => setTool('move')}
+              title="Move"
+            >
+              ✥
             </button>
             <button
               className={tool === 'select' ? 'active' : ''}
               onClick={() => setTool('select')}
+              title="Select"
             >
-              ⛶ Select
+              ⛶
             </button>
           </div>
         )}
@@ -358,27 +366,36 @@ function Toolbar({
               onChange={(e) => setExportMode(e.target.value)}
             >
               <option value="single">Single Layer</option>
-              <option value="horizontal">All Layers (Horizontal)</option>
-              <option value="vertical">All Layers (Vertical)</option>
+              <option value="spritesheet">Sprite Sheet</option>
             </select>
 
-            <div className="subsection" style={{ marginTop: '10px' }}>
-              <label>Grid Layout</label>
-              <select
-                value={exportMode.startsWith('grid') ? exportMode : 'grid-1'}
-                onChange={(e) => setExportMode(e.target.value)}
-              >
-                <option value="grid-1">1 row (all layers horizontal)</option>
-                <option value="grid-2">2 rows</option>
-                <option value="grid-3">3 rows</option>
-                <option value="grid-4">4 rows</option>
-                <option value="grid-5">5 rows</option>
-                <option value="grid-6">6 rows</option>
-              </select>
-              <small style={{ color: '#999', marginTop: '4px', display: 'block' }}>
-                Arranges layers in a grid layout
-              </small>
-            </div>
+            {exportMode === 'spritesheet' && (
+              <div className="subsection" style={{ marginTop: '10px' }}>
+                <label>Sprite Sheet Rows</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={exportRows}
+                  onChange={(e) => setExportRows(parseInt(e.target.value) || 1)}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    backgroundColor: '#0f0f0f',
+                    border: '1px solid #1c1c1c',
+                    borderRadius: '4px',
+                    color: '#fff',
+                    fontSize: '14px'
+                  }}
+                />
+                <small style={{ color: '#999', marginTop: '4px', display: 'block' }}>
+                  Arranges {totalFrames} layer{totalFrames !== 1 ? 's' : ''} in {exportRows} row{exportRows !== 1 ? 's' : ''} ({Math.ceil(totalFrames / exportRows)} column{Math.ceil(totalFrames / exportRows) !== 1 ? 's' : ''})
+                </small>
+              </div>
+            )}
+            <button onClick={onSave} className="save-btn" style={{ marginTop: '10px' }}>
+              💾 Save as Sprite
+            </button>
           </div>
         )}
       </div>
@@ -389,15 +406,14 @@ function Toolbar({
         <button onClick={onResetAll} className="reset-all-btn">
           ⚠️ Reset All
         </button>
-        <button onClick={onCopy} disabled={!hasSelection} title={!hasSelection ? 'Make a selection first' : 'Copy'}>
-          📋 Copy
-        </button>
-        <button onClick={onPaste} disabled={!hasSelection} title={!hasSelection ? 'Copy first' : 'Paste'}>
-          📄 Paste
-        </button>
-        <button onClick={onSave} className="save-btn">
-          💾 Save as Sprite
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button onClick={onCopy} disabled={!hasSelection} title={!hasSelection ? 'Make a selection first' : 'Copy'} style={{ flex: 1 }}>
+            📋 Copy
+          </button>
+          <button onClick={onPaste} disabled={!hasSelection} title={!hasSelection ? 'Copy first' : 'Paste'} style={{ flex: 1 }}>
+            📄 Paste
+          </button>
+        </div>
       </div>
     </div>
   );

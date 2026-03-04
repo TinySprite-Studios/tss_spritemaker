@@ -24,11 +24,14 @@ const Canvas = React.forwardRef((props, ref) => {
     selection,
     setSelection,
     canvasBackgroundColor,
+    onActionComplete,
   } = props;
 
   const stageRef = useRef(null);
   const isDrawing = useRef(false);
   const selectionStart = useRef(null);
+  const moveStart = useRef(null);
+  const originalSelection = useRef(null);
   const [currentPointer, setCurrentPointer] = useState(null);
   const [stageSize, setStageSize] = useState({
     width: Math.max(400, window.innerWidth - 560),
@@ -91,7 +94,7 @@ const Canvas = React.forwardRef((props, ref) => {
             }))
           );
         },
-        exportSprite: (mode = 'single') => {
+        exportSprite: (mode = 'single', rows = 1) => {
           if (mode === 'single') {
             const exportCanvas = document.createElement('canvas');
             exportCanvas.width = gridSize;
@@ -116,63 +119,8 @@ const Canvas = React.forwardRef((props, ref) => {
             });
 
             return exportCanvas;
-          } else if (mode === 'horizontal') {
-            const exportCanvas = document.createElement('canvas');
-            exportCanvas.width = gridSize * layers.length;
-            exportCanvas.height = gridSize;
-
-            const context = exportCanvas.getContext('2d');
-            if (!context) {
-              return exportCanvas;
-            }
-
-            context.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
-
-            layers.forEach((layer, layerIdx) => {
-              layer.pixels.forEach((row, rowIdx) => {
-                row.forEach((color, colIdx) => {
-                  if (!color) {
-                    return;
-                  }
-
-                  context.fillStyle = color;
-                  const xOffset = layerIdx * gridSize;
-                  context.fillRect(xOffset + colIdx, rowIdx, 1, 1);
-                });
-              });
-            });
-
-            return exportCanvas;
-          } else if (mode === 'vertical') {
-            const exportCanvas = document.createElement('canvas');
-            exportCanvas.width = gridSize;
-            exportCanvas.height = gridSize * layers.length;
-
-            const context = exportCanvas.getContext('2d');
-            if (!context) {
-              return exportCanvas;
-            }
-
-            context.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
-
-            layers.forEach((layer, layerIdx) => {
-              layer.pixels.forEach((row, rowIdx) => {
-                row.forEach((color, colIdx) => {
-                  if (!color) {
-                    return;
-                  }
-
-                  context.fillStyle = color;
-                  const yOffset = layerIdx * gridSize;
-                  context.fillRect(colIdx, yOffset + rowIdx, 1, 1);
-                });
-              });
-            });
-
-            return exportCanvas;
-          } else if (mode.startsWith('grid')) {
-            // Grid layout mode: e.g., 'grid-2' means 2 rows
-            const rows = parseInt(mode.split('-')[1]) || 1;
+          } else if (mode === 'spritesheet') {
+            // Grid layout mode based on rows
             const cols = Math.ceil(layers.length / rows);
             
             const exportCanvas = document.createElement('canvas');
@@ -313,6 +261,14 @@ const Canvas = React.forwardRef((props, ref) => {
     if (tool === 'select') {
       selectionStart.current = cell;
       isDrawing.current = true;
+    } else if (tool === 'move') {
+      if (selection && 
+          cell.row >= selection.startRow && cell.row <= selection.endRow &&
+          cell.col >= selection.startCol && cell.col <= selection.endCol) {
+        moveStart.current = cell;
+        originalSelection.current = { ...selection };
+        isDrawing.current = true;
+      }
     } else {
       isDrawing.current = true;
       handleDraw(e);
@@ -357,14 +313,90 @@ const Canvas = React.forwardRef((props, ref) => {
         endCol,
         data,
       });
+    } else if (tool === 'move' && moveStart.current && cell) {
+      const deltaRow = cell.row - moveStart.current.row;
+      const deltaCol = cell.col - moveStart.current.col;
+      
+      if (deltaRow !== 0 || deltaCol !== 0) {
+        const newStartRow = selection.startRow + deltaRow;
+        const newStartCol = selection.startCol + deltaCol;
+        const newEndRow = selection.endRow + deltaRow;
+        const newEndCol = selection.endCol + deltaCol;
+        
+        if (newStartRow >= 0 && newEndRow < gridSize && 
+            newStartCol >= 0 && newEndCol < gridSize) {
+          setSelection({
+            ...selection,
+            startRow: newStartRow,
+            startCol: newStartCol,
+            endRow: newEndRow,
+            endCol: newEndCol,
+          });
+          moveStart.current = cell;
+        }
+      }
     } else {
       handleDraw(e);
     }
   };
 
   const handleMouseUp = () => {
+    let actionOccurred = false;
+    
+    if (tool === 'move' && moveStart.current && selection && originalSelection.current) {
+      actionOccurred = true;
+      // Apply the moved selection to the layer
+      setLayers((prevLayers) =>
+        prevLayers.map((layer) => {
+          if (layer.id !== activeLayerId) {
+            return layer;
+          }
+
+          const nextPixels = layer.pixels.map((row) => [...row]);
+          
+          // Clear the original position (only if it moved)
+          if (originalSelection.current.startRow !== selection.startRow ||
+              originalSelection.current.startCol !== selection.startCol) {
+            for (let r = originalSelection.current.startRow; r <= originalSelection.current.endRow; r++) {
+              for (let c = originalSelection.current.startCol; c <= originalSelection.current.endCol; c++) {
+                nextPixels[r][c] = null;
+              }
+            }
+          }
+          
+          // Paste the selection data at the new position
+          selection.data.forEach((dataRow, rowIdx) => {
+            dataRow.forEach((color, colIdx) => {
+              const targetRow = selection.startRow + rowIdx;
+              const targetCol = selection.startCol + colIdx;
+              if (targetRow >= 0 && targetRow < gridSize && 
+                  targetCol >= 0 && targetCol < gridSize) {
+                nextPixels[targetRow][targetCol] = color;
+              }
+            });
+          });
+
+          return {
+            ...layer,
+            pixels: nextPixels,
+          };
+        })
+      );
+    } else if (tool === 'select' && selection) {
+      actionOccurred = true;
+    } else if ((tool === 'pen' || tool === 'eraser') && isDrawing.current) {
+      actionOccurred = true;
+    }
+    
     isDrawing.current = false;
     selectionStart.current = null;
+    moveStart.current = null;
+    originalSelection.current = null;
+    
+    // Save to history after action completes
+    if (actionOccurred && onActionComplete) {
+      setTimeout(onActionComplete, 0); // Use setTimeout to ensure state updates complete
+    }
   };
 
   return (

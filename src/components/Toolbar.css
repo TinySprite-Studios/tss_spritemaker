@@ -48,11 +48,9 @@
 
 .tool-buttons {
   display: flex;
-  gap: 8px;
-}
-
-.tool-buttons button {
-  flex: 1;
+  gap: 6px;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
 }
 
 .subsection {
@@ -101,6 +99,38 @@
 }
 
 .toolbar-section button.active {
+  background-color: #ff1a1a;
+  border-color: #ff1a1a;
+  box-shadow: 0 0 10px rgba(255, 26, 26, 0.5);
+}
+
+/* Tool buttons override - must come after general button styles */
+.tool-buttons button {
+  width: 35px !important;
+  height: 35px;
+  min-width: 35px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  padding: 0 !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  border: 1px solid #1c1c1c;
+  border-radius: 4px;
+  background-color: #0f0f0f;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tool-buttons button:hover {
+  background-color: #1a1a1a;
+  border-color: #333;
+}
+
+.tool-buttons button.active {
   background-color: #ff1a1a;
   border-color: #ff1a1a;
   box-shadow: 0 0 10px rgba(255, 26, 26, 0.5);

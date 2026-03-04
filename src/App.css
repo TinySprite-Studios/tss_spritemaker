@@ -12,10 +12,42 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .app-header h1 {
   color: #ff1a1a;
   font-size: 28px;
   margin: 0;
+}
+
+.header-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.header-btn {
+  padding: 8px 16px;
+  background-color: #1a1a1a;
+  border: 1px solid #1c1c1c;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.header-btn:hover:not(:disabled) {
+  background-color: #2a2a2a;
+  border-color: #333;
+}
+
+.header-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .app-container {
