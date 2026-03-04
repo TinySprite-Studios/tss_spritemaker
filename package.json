@@ -71,7 +71,9 @@
           "target": "dmg",
           "arch": ["x64", "arm64"]
         }
-      ]
+      ],
+      "sign": null,
+      "notarize": false
     }
   },
   "browserslist": {
