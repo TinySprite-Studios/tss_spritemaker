@@ -18,9 +18,9 @@
     "build-onedrive": "electron-builder --win --publish never",
     "build": "build-safe.bat",
     "build-debug": "powershell -ExecutionPolicy Bypass -File ./build-safe.ps1 -ShowOutput",
-    "build-linux": "npm run react-build && electron-builder --linux",
-    "build-mac": "npm run react-build && electron-builder --mac",
-    "build-windows": "npm run react-build && electron-builder --win"
+    "build-linux": "npm run react-build && electron-builder --linux --publish never",
+    "build-mac": "npm run react-build && electron-builder --mac --publish never",
+    "build-windows": "npm run react-build && electron-builder --win --publish never"
   },
   "dependencies": {
     "electron-is-dev": "^2.0.0",

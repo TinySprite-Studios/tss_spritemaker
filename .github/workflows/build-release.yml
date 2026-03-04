@@ -27,10 +27,14 @@ jobs:
       - name: Build application (Windows)
         if: matrix.os == 'windows-latest'
         run: npm run build-windows
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Build application (macOS)
         if: matrix.os == 'macos-latest'
         run: npm run build-mac
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: false
 
       - name: Build application (Linux)
         if: matrix.os == 'ubuntu-latest'
